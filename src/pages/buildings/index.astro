@@ -1,0 +1,49 @@
+---
+import Base from "../../layouts/Base.astro";
+import DataTable from "../../components/DataTable.astro";
+import Related from "../../components/Related.astro";
+import buildings from "../../data/satisfactory_buildings.json";
+
+const n = (v: any) => {
+  const m = String(v ?? "").match(/-?\d+(?:\.\d+)?/);
+  return m ? parseFloat(m[0]) : "";
+};
+const rows = buildings
+  .map((x) => ({
+    name: `<a href="/buildings/${x.slug}/">${x.title}</a>${x.icon_file ? ` <img src="/icons/${x.icon_file}" alt="" width="22" height="22" style="vertical-align:middle" loading="lazy" />` : ""}`,
+    _sort: x.title.toLowerCase(),
+    category: (x.fields?.category || "").slice(0, 22),
+    power: n(x.fields?.powerusage),
+    width: n(x.fields?.size_width),
+    length: n(x.fields?.size_length),
+    height: n(x.fields?.size_height),
+  }))
+  .sort((a: any, b: any) => a._sort.localeCompare(b._sort));
+---
+<Base
+  title={`Satisfactory Buildings — ${buildings.length} machines with power usage & dimensions`}
+  description={`Satisfactory building database: power usage, dimensions, unlock tiers and crafting costs for ${buildings.length} machines and structures.`}
+>
+  <h1>Buildings</h1>
+  <p class="muted">{buildings.length} buildings · power usage (MW), footprint dimensions and category. Click a column to sort.</p>
+  <DataTable
+    id="buildings"
+    rows={rows as any}
+    searchPlaceholder="Search buildings..."
+    columns={[
+      { key: "name", label: "Building" },
+      { key: "category", label: "Category" },
+      { key: "power", label: "Power (MW)", type: "number" },
+      { key: "width", label: "W", type: "number" },
+      { key: "length", label: "L", type: "number" },
+      { key: "height", label: "H", type: "number" },
+    ]}
+  />
+  <Related
+    links={[
+      { href: "/items/", title: "Items", sub: "Recipes & rates" },
+      { href: "/production-calculator/", title: "Production Calculator", sub: "Per-minute rates", tool: true },
+      { href: "/rankings/", title: "Rankings", sub: "Best picks" },
+    ]}
+  />
+</Base>

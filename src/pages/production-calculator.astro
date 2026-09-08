@@ -1,0 +1,102 @@
+---
+import Base from "../layouts/Base.astro";
+import Related from "../components/Related.astro";
+import items from "../data/satisfactory_items.json";
+
+const entries = items
+  .filter((x: any) => x.recipes?.length)
+  .map((x: any) => ({
+    slug: x.slug,
+    name: x.title,
+    icon: x.icon_file || "",
+    recipes: x.recipes.map((rc: any) => ({
+      name: rc.name || x.title,
+      alternate: rc.alternate,
+      machine: rc.crafted_in,
+      time: rc.craft_time,
+      productCount: rc.product_count || 1,
+      product: rc.product || x.title,
+      tier: rc.tier,
+      ingredients: rc.ingredients,
+    })),
+  }))
+  .sort((a: any, b: any) => a.name.localeCompare(b.name));
+---
+<Base
+  title="Satisfactory Production Calculator — per-minute crafting rates"
+  description="Satisfactory production calculator: pick an item and recipe to see exact per-minute input and output rates, including all alternate recipes."
+>
+  <h1>Production Calculator</h1>
+  <p class="muted">Pick an item, pick a recipe — get exact per-minute rates for inputs and outputs, so you know how many machines and conveyors you need. Rates assume 100% clock speed.</p>
+
+  <div class="grid grid-2" style="margin:1rem 0">
+    <div class="card">
+      <strong>1 · Pick item</strong>
+      <input id="q" type="search" placeholder="Filter items..." style="width:100%;max-width:320px;margin:0.5rem 0" />
+      <select id="item" size="14" style="width:100%">
+        {entries.map((x: any) => <option value={x.slug}>{x.name}</option>)}
+      </select>
+    </div>
+    <div class="card">
+      <strong>2 · Pick recipe</strong>
+      <select id="recipe" size="6" style="width:100%;margin:0.5rem 0"></select>
+      <label style="display:block;margin:0.5rem 0">Target output per minute: <input id="rate" type="number" value="60" min="0.1" step="0.5" style="width:90px" /></label>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script define:vars={{ entries }}>
+    const bySlug = Object.fromEntries(entries.map((x) => [x.slug, x]));
+    const q = document.getElementById("q");
+    const itemSel = document.getElementById("item");
+    const recipeSel = document.getElementById("recipe");
+    const rateEl = document.getElementById("rate");
+    const result = document.getElementById("result");
+    const fillRecipes = () => {
+      const it = bySlug[itemSel.value];
+      if (!it) return;
+      recipeSel.innerHTML = it.recipes.map((rc, i) =>
+        `<option value="${i}">${rc.name}${rc.alternate ? " (Alternate)" : ""} — ${rc.machine}</option>`
+      ).join("");
+      render();
+    };
+    const render = () => {
+      const it = bySlug[itemSel.value];
+      if (!it) return;
+      const rc = it.recipes[parseInt(recipeSel.value || "0")];
+      if (!rc) { result.innerHTML = ""; return; }
+      const rate = parseFloat(rateEl.value) || 0;
+      const cyclesPerMin = rc.time ? 60 / rc.time : 0;
+      const machines = cyclesPerMin ? rate / (cyclesPerMin * rc.productCount) : 0;
+      let html = `<div class="stat-row" style="margin:0.5rem 0">
+        <div><div class="stat-num">${Math.round(machines * 100) / 100}</div><div class="stat-label">${rc.machine}(s)</div></div>
+        <div><div class="stat-num">${Math.round(cyclesPerMin * 100) / 100}</div><div class="stat-label">cycles/min</div></div>
+      </div>`;
+      html += `<p style="margin:0.3rem 0"><strong>Inputs needed:</strong></p><p>`;
+      rc.ingredients.forEach((ing) => {
+        const perMin = cyclesPerMin * ing.qty;
+        html += `<span class="tag" style="margin:0.1rem">${ing.qty}× ${ing.name} → ${Math.round(perMin * 10) / 10}/min</span>`;
+      });
+      html += `</p>`;
+      result.innerHTML = html;
+    };
+    document.getElementById("q").addEventListener("input", (e) => {
+      const v = e.target.value.trim().toLowerCase();
+      Array.from(itemSel.options).forEach((o) => {
+        o.hidden = v && !o.textContent.toLowerCase().includes(v);
+      });
+    });
+    itemSel.addEventListener("change", fillRecipes);
+    recipeSel.addEventListener("change", render);
+    rateEl.addEventListener("input", render);
+    fillRecipes();
+  </script>
+
+  <Related
+    links={[
+      { href: "/items/", title: "Items", sub: "All recipes" },
+      { href: "/buildings/", title: "Buildings", sub: "Machines & power" },
+      { href: "/rankings/", title: "Rankings", sub: "Fastest & heaviest" },
+    ]}
+  />
+</Base>

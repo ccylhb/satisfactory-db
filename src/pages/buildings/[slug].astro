@@ -1,0 +1,50 @@
+---
+import Base from "../../layouts/Base.astro";
+import Related from "../../components/Related.astro";
+import EntryStats from "../../components/EntryStats.astro";
+import buildings from "../../data/satisfactory_buildings.json";
+
+export function getStaticPaths() {
+  return buildings.map((x: any) => ({ params: { slug: x.slug }, props: { x } }));
+}
+
+const { x } = Astro.props as any;
+const f = x.fields || {};
+const costs = [1, 2, 3, 4, 5].map((i) => ({ name: f[`ingredient${i}`], qty: f[`quantity${i}`] })).filter((c) => c.name);
+const similar = buildings
+  .filter((o: any) => o.slug !== x.slug && (o.fields?.category || "") === (f.category || ""))
+  .slice(0, 6);
+---
+<Base
+  title={`${x.title} — Satisfactory building stats (power ${f.powerusage || "?"} MW)`}
+  description={`${x.title}: ${f.powerusage || "?"} MW power usage${f.researchtier ? `, ${f.researchtier}` : ""} — Satisfactory machine stats and costs.`}
+>
+  <h1 class="icon-h1">
+    {x.icon_file ? <img src={`/icons/${x.icon_file}`} alt={x.title} loading="eager" /> : null}
+    <span>{x.title}</span>
+  </h1>
+  {f.description && <p class="muted">{f.description}</p>}
+  <EntryStats entry={x} keys={["powerusage", "size_width", "size_length", "size_height", "inputs", "outputs"]} labels={{ powerusage: "Power (MW)", size_width: "Width (m)", size_length: "Length (m)", size_height: "Height (m)", inputs: "Inputs", outputs: "Outputs" }} />
+  <p>
+    {f.category && <span class="tag" style="margin:0.1rem">{f.category}</span>}
+    {f.subcategory && <span class="tag" style="margin:0.1rem">{f.subcategory}</span>}
+    {f.researchtier && <span class="tag" style="margin:0.1rem">{f.researchTier}</span>}
+    {f.overclockable && <span class="tag" style="margin:0.1rem">Overclockable</span>}
+  </p>
+  {costs.length > 0 && (
+    <p><strong>Build cost:</strong> {costs.map((c) => `${c.qty}× ${c.name.replace(/\[|\]/g, "")}`).join(" · ")}</p>
+  )}
+  {x.intro && <p>{x.intro}</p>}
+  <Related
+    links={[
+      ...similar.map((s: any) => ({
+        href: `/buildings/${s.slug}/`,
+        title: s.title,
+        sub: `${s.fields?.powerusage || "?"} MW`,
+        icon: s.icon_file ? `/icons/${s.icon_file}` : undefined,
+      })),
+      { href: "/buildings/", title: "All Buildings", sub: "Sortable power table" },
+      { href: "/items/", title: "Items", sub: "Recipes & rates" },
+    ]}
+  />
+</Base>

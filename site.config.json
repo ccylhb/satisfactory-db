@@ -1,0 +1,29 @@
+{
+  "siteName": "SatisfactoryDB",
+  "siteUrl": "https://satisfactory-db.pages.dev",
+  "tagline": "Satisfactory database — recipes, machines & production rates",
+  "description": "Satisfactory stats: crafting recipes with per-minute rates, alternate recipes, machines, buildings and production chains — with a production calculator.",
+  "adsenseClientId": "ca-pub-3245910354455258",
+  "adsensePublisherId": "pub-3245910354455258",
+  "favicon": "⚙️",
+  "footerNote": "Unofficial fan-made database for Satisfactory. Not affiliated with Coffee Stain Studios.",
+  "theme": {
+    "bg": "#14161a",
+    "bgSoft": "#1b1e24",
+    "card": "#21252c",
+    "border": "#353b45",
+    "text": "#e6e9ee",
+    "muted": "#98a0ac",
+    "accent": "#f07f09",
+    "accent2": "#ffa542",
+    "good": "#7fb069",
+    "bad": "#c75146"
+  },
+  "nav": [
+    { "href": "/items/", "label": "Items" },
+    { "href": "/buildings/", "label": "Buildings" },
+    { "href": "/rankings/", "label": "Rankings" },
+    { "href": "/production-calculator/", "label": "Production Calculator", "tool": true },
+    { "href": "/search/", "label": "A-Z" }
+  ]
+}

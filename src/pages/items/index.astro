@@ -1,0 +1,56 @@
+---
+import Base from "../../layouts/Base.astro";
+import DataTable from "../../components/DataTable.astro";
+import Related from "../../components/Related.astro";
+import items from "../../data/satisfactory_items.json";
+
+const n = (v: any) => {
+  const m = String(v ?? "").match(/-?\d+(?:\.\d+)?/);
+  return m ? parseFloat(m[0]) : "";
+};
+const rows = items
+  .map((x) => {
+    const best = x.recipes?.find((rc: any) => !rc.alternate) || x.recipes?.[0];
+    let perMin = "";
+    if (best?.craft_time && best?.product_count) {
+      perMin = Math.round((60 / best.craft_time) * best.product_count * 10) / 10;
+    }
+    return {
+      name: `<a href="/items/${x.slug}/">${x.title}</a>${x.icon_file ? ` <img src="/icons/${x.icon_file}" alt="" width="22" height="22" style="vertical-align:middle" loading="lazy" />` : ""}`,
+      _sort: x.title.toLowerCase(),
+      stack: n(x.fields?.stackSize),
+      tier: (best?.tier || "").replace(/^\[|\]$/g, "").slice(0, 28),
+      machine: (best?.crafted_in || "").slice(0, 20),
+      perMin,
+      recipes: x.recipes?.length || 0,
+    };
+  })
+  .sort((a: any, b: any) => a._sort.localeCompare(b._sort));
+---
+<Base
+  title={`Satisfactory Items — ${items.length} items with recipes & per-minute rates`}
+  description={`Satisfactory item database: crafting recipes including alternate recipes, per-minute production rates, machines and tiers for ${items.length} items.`}
+>
+  <h1>Items</h1>
+  <p class="muted">{items.length} items · default recipe per-minute rate, machine and unlock tier. Click a column to sort.</p>
+  <DataTable
+    id="items"
+    rows={rows as any}
+    searchPlaceholder="Search items..."
+    columns={[
+      { key: "name", label: "Item" },
+      { key: "perMin", label: "Per minute (default)", type: "number" },
+      { key: "machine", label: "Machine" },
+      { key: "tier", label: "Tier" },
+      { key: "stack", label: "Stack size", type: "number" },
+      { key: "recipes", label: "Recipes", type: "number" },
+    ]}
+  />
+  <Related
+    links={[
+      { href: "/production-calculator/", title: "Production Calculator", sub: "Per-minute rates", tool: true },
+      { href: "/rankings/", title: "Rankings", sub: "Fastest & heaviest" },
+      { href: "/buildings/", title: "Buildings", sub: "Machines & power" },
+    ]}
+  />
+</Base>
