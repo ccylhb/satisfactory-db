@@ -17,6 +17,25 @@ const similar = buildings
   .filter((o: any) => o.slug !== x.slug && (o.fields?.category || "") === (f.category || ""))
   .slice(0, 6);
 const ihtml = introHtml(x.intro, mesh, x.title);
+const __slug = Astro.params.slug;
+const __ld = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://satisfactory-db.pages.dev/" },
+      { "@type": "ListItem", position: 2, name: "Buildings", item: "https://satisfactory-db.pages.dev/buildings/" },
+      { "@type": "ListItem", position: 3, name: x.title },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: x.title,
+    description: (x.intro || "").slice(0, 160),
+    mainEntityOfPage: "https://satisfactory-db.pages.dev" + "/buildings/" + __slug + "/",
+  },
+];
 ---
 <Base
   title={`${x.title} — Satisfactory building stats (power ${f.powerusage || "?"} MW)`}
@@ -52,4 +71,5 @@ const ihtml = introHtml(x.intro, mesh, x.title);
       { href: "/rankings/", title: "Rankings", sub: "Best picks" },
     ]}
   />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(__ld)}></script>
 </Base>

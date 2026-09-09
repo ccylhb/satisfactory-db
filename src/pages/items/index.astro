@@ -26,6 +26,23 @@ const rows = items
     };
   })
   .sort((a: any, b: any) => a._sort.localeCompare(b._sort));
+const __ld = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://satisfactory-db.pages.dev/" },
+      { "@type": "ListItem", position: 2, name: "Items", item: "https://satisfactory-db.pages.dev/items/" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Items",
+    mainEntityOfPage: "https://satisfactory-db.pages.dev/items/",
+  },
+];
+
 ---
 <Base
   title={`Satisfactory Items — ${items.length} items with recipes & per-minute rates`}
@@ -53,4 +70,5 @@ const rows = items
       { href: "/buildings/", title: "Buildings", sub: "Machines & power" },
     ]}
   />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(__ld)}></script>
 </Base>

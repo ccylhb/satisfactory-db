@@ -19,6 +19,16 @@ const rows = data.flatMap((x: any) =>
     altOf: rc.name === rc.product ? "Alternate" : "Alt of " + rc.product,
   }))
 );
+const __ld = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: `All Alternate Recipes`,
+    description: `Every Satisfactory alternate recipe in one table — where to unlock each via hard drives and what ingredients the alternative uses.`,
+    mainEntityOfPage: "https://satisfactory-db.pages.dev/alternate-recipes/",
+  },
+];
+
 ---
 <Base
   title={`All Alternate Recipes`}
@@ -40,4 +50,5 @@ const rows = data.flatMap((x: any) =>
       { key: "altOf", label: "Type" },
     ]}
   />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(__ld)}></script>
 </Base>

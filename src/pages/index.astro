@@ -21,6 +21,18 @@ const bestItem = items
   .filter((x: any) => x.recipes?.length)
   .map((x: any) => ({ ...x, perMin: defPerMin(x) }))
   .sort((a: any, b: any) => b.perMin - a.perMin)[0];
+const __ld = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "SatisfactoryDB",
+  url: "https://satisfactory-db.pages.dev/",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: { "@type": "EntryPoint", urlTemplate: "https://satisfactory-db.pages.dev/search/?q={search_term_string}" },
+    "query-input": "required name=search_term_string",
+  },
+};
+
 ---
 <Base title="SatisfactoryDB — Satisfactory recipes, machines & production rates" description={`Satisfactory stats database: ${total} entries — crafting recipes with per-minute rates, alternate recipes, machines, buildings and power usage with a production calculator.`}>
   <div style="text-align:center;margin:2.5rem 0 2rem">
@@ -78,4 +90,5 @@ const bestItem = items
       { href: "/production-calculator/", title: "Production Calculator", sub: "Per-minute rates", tool: true },
     ]}
   />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(__ld)}></script>
 </Base>

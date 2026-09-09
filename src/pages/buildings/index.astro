@@ -19,6 +19,23 @@ const rows = buildings
     height: n(x.fields?.size_height),
   }))
   .sort((a: any, b: any) => a._sort.localeCompare(b._sort));
+const __ld = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://satisfactory-db.pages.dev/" },
+      { "@type": "ListItem", position: 2, name: "Buildings", item: "https://satisfactory-db.pages.dev/buildings/" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Buildings",
+    mainEntityOfPage: "https://satisfactory-db.pages.dev/buildings/",
+  },
+];
+
 ---
 <Base
   title={`Satisfactory Buildings — ${buildings.length} machines with power usage & dimensions`}
@@ -46,4 +63,5 @@ const rows = buildings
       { href: "/rankings/", title: "Rankings", sub: "Best picks" },
     ]}
   />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(__ld)}></script>
 </Base>
