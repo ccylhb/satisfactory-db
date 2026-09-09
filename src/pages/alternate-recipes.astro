@@ -1,0 +1,43 @@
+---
+import Base from "../layouts/Base.astro";
+import DataTable from "../components/DataTable.astro";
+import items from "../data/satisfactory_items.json";
+const n = (v: any) => {
+  const m = String(v ?? "").match(/-?\d+(?:\.\d+)?/);
+  return m ? m[0] : "";
+};
+const ingStr = (rc: any) => (rc.ingredients || []).map((i: any) => `${i.qty}× ${i.name}`).join(" + ");
+let data = items.filter((x: any) => (x.recipes || []).some((rc: any) => rc.alternate));
+data = data.sort((a: any, b: any) => a.title.localeCompare(b.title));
+const rows = data.flatMap((x: any) =>
+  (x.recipes || []).filter((rc: any) => rc.alternate).map((rc: any) => ({
+    name: `<a href="/items/${x.slug}/">${x.title}</a>${x.icon_file ? ` <img src="/icons/${x.icon_file}" alt="" width="22" height="22" style="vertical-align:middle" loading="lazy" />` : ""}`,
+    perMin: String(Math.round((60 / (rc.craft_time || 1)) * (rc.product_count || 1) * 10) / 10),
+    time: rc.craft_time,
+    craftedIn: (rc.crafted_in || "").slice(0, 16),
+    ingredients: ingStr(rc).slice(0, 90),
+    altOf: rc.name === rc.product ? "Alternate" : "Alt of " + rc.product,
+  }))
+);
+---
+<Base
+  title={`All Alternate Recipes`}
+  description={`Every Satisfactory alternate recipe in one table — where to unlock each via hard drives and what ingredients the alternative uses.`}
+>
+  <h1>All Alternate Recipes</h1>
+  <p class="muted">Every Satisfactory alternate recipe in one table — where to unlock each via hard drives and what ingredients the alternative uses.</p>
+  
+  <DataTable
+    id="alternate-recipes"
+    rows={rows as any}
+    searchPlaceholder="Filter..."
+    columns={[
+      { key: "name", label: "Item" },
+      { key: "perMin", label: "Per min", type: "number" },
+      { key: "time", label: "Sec", type: "number" },
+      { key: "craftedIn", label: "Machine" },
+      { key: "ingredients", label: "Ingredients" },
+      { key: "altOf", label: "Type" },
+    ]}
+  />
+</Base>

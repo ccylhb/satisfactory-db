@@ -3,6 +3,8 @@ import Base from "../../layouts/Base.astro";
 import Related from "../../components/Related.astro";
 import EntryStats from "../../components/EntryStats.astro";
 import buildings from "../../data/satisfactory_buildings.json";
+import mesh from "../../data/mesh.json";
+import { introHtml } from "../../lib/mesh";
 
 export function getStaticPaths() {
   return buildings.map((x: any) => ({ params: { slug: x.slug }, props: { x } }));
@@ -14,6 +16,7 @@ const costs = [1, 2, 3, 4, 5].map((i) => ({ name: f[`ingredient${i}`], qty: f[`q
 const similar = buildings
   .filter((o: any) => o.slug !== x.slug && (o.fields?.category || "") === (f.category || ""))
   .slice(0, 6);
+const ihtml = introHtml(x.intro, mesh, x.title);
 ---
 <Base
   title={`${x.title} — Satisfactory building stats (power ${f.powerusage || "?"} MW)`}
@@ -34,7 +37,7 @@ const similar = buildings
   {costs.length > 0 && (
     <p><strong>Build cost:</strong> {costs.map((c) => `${c.qty}× ${c.name.replace(/\[|\]/g, "")}`).join(" · ")}</p>
   )}
-  {x.intro && <p>{x.intro}</p>}
+  {ihtml && <p set:html={ihtml}></p>}
   <Related
     links={[
       ...similar.map((s: any) => ({
@@ -45,6 +48,8 @@ const similar = buildings
       })),
       { href: "/buildings/", title: "All Buildings", sub: "Sortable power table" },
       { href: "/items/", title: "Items", sub: "Recipes & rates" },
+    
+      { href: "/rankings/", title: "Rankings", sub: "Best picks" },
     ]}
   />
 </Base>

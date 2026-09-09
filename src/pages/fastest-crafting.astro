@@ -1,0 +1,41 @@
+---
+import Base from "../layouts/Base.astro";
+import DataTable from "../components/DataTable.astro";
+import items from "../data/satisfactory_items.json";
+const n = (v: any) => {
+  const m = String(v ?? "").match(/-?\d+(?:\.\d+)?/);
+  return m ? m[0] : "";
+};
+const flat = items.flatMap((x: any) => (x.recipes || []).map((rc: any) => ({ x, rc })));
+let data = flat.filter((r: any) => !r.rc.alternate && r.rc.craft_time);
+data = data.sort((a: any, b: any) =>
+  (60 / b.rc.craft_time) * (b.rc.product_count || 1) - (60 / a.rc.craft_time) * (a.rc.product_count || 1)
+);
+const rows = data.slice(0, 60).map((r: any) => ({
+    name: `<a href="/items/${r.x.slug}/">${r.x.title}</a>${r.x.icon_file ? ` <img src="/icons/${r.x.icon_file}" alt="" width="22" height="22" style="vertical-align:middle" loading="lazy" />` : ""}`,
+    perMin: String(Math.round((60 / r.rc.craft_time) * (r.rc.product_count || 1) * 10) / 10),
+    time: r.rc.craft_time,
+    count: r.rc.product_count,
+    craftedIn: (r.rc.crafted_in || "").slice(0, 16),
+  }));
+---
+<Base
+  title={`Fastest Crafting Recipes — Output per Minute`}
+  description={`Satisfactory recipes ranked by items per minute at 100% clock speed — which production lines feed your factory fastest.`}
+>
+  <h1>Fastest Crafting Recipes — Output per Minute</h1>
+  <p class="muted">Satisfactory recipes ranked by items per minute at 100% clock speed — which production lines feed your factory fastest.</p>
+  
+  <DataTable
+    id="fastest-crafting"
+    rows={rows as any}
+    searchPlaceholder="Filter..."
+    columns={[
+      { key: "name", label: "Item" },
+      { key: "perMin", label: "Per min", type: "number" },
+      { key: "time", label: "Craft sec", type: "number" },
+      { key: "count", label: "Qty", type: "number" },
+      { key: "craftedIn", label: "Machine" },
+    ]}
+  />
+</Base>
