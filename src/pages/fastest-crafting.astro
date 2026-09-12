@@ -1,4 +1,5 @@
 ---
+const SITE = Astro.site?.origin ?? "";
 import Base from "../layouts/Base.astro";
 import DataTable from "../components/DataTable.astro";
 import items from "../data/satisfactory_items.json";
@@ -24,7 +25,7 @@ const __ld = [
     "@type": "Article",
     headline: `Fastest Crafting Recipes — Output per Minute`,
     description: `Satisfactory recipes ranked by items per minute at 100% clock speed — which production lines feed your factory fastest.`,
-    mainEntityOfPage: "https://satisfactory-db.pages.dev/fastest-crafting/",
+    mainEntityOfPage: SITE + "/fastest-crafting/",
   },
 ];
 
