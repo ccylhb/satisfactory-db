@@ -40,6 +40,16 @@
     {
       "href": "/search/",
       "label": "A-Z"
+    },
+    {
+      "href": "/alternate-recipes/",
+      "label": "Alt Recipes",
+      "tool": true
+    },
+    {
+      "href": "/fastest-crafting/",
+      "label": "Fastest Crafting",
+      "tool": true
     }
   ],
   "sisterSites": [
